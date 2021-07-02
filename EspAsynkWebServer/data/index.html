@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>ESP Web Server</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+    <h2>ESP Web Server</h2>
+    %BUTTONPLACEHOLDER%
+    <br /><a href="/input">Clicca qui</a>
+    <script>
+        function toggleCheckbox(element) {
+            var xhr = new XMLHttpRequest();
+            if (element.checked) {
+                xhr.open("GET", "/update?output=" + element.id + "&state=1", true);
+            } else {
+                xhr.open("GET", "/update?output=" + element.id + "&state=0", true);
+            }
+            xhr.send();
+        }
+    </script>
+</body>
+
+</html>

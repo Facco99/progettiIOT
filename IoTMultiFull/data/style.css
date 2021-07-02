@@ -1,0 +1,164 @@
+h1 {
+    font-family: Helvetica;
+    text-align: center;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    padding: 10px;
+}
+
+.grid-item {
+    padding: 10px;
+    text-align: center;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 97px;
+    height: 47px
+}
+
+.switch input {
+    display: none
+}
+
+.slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 6px
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 30px;
+    width: 30px;
+    left: 8px;
+    bottom: 8px;
+    background-color: #fff;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 3px
+}
+
+input:checked+.slider {
+    background-color: #00a3da
+}
+
+input:checked+.slider:before {
+    -webkit-transform: translateX(52px);
+    -ms-transform: translateX(52px);
+    transform: translateX(52px)
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+    font-size: large;
+}
+
+.dotOff {
+    height: 25px;
+    width: 25px;
+    background-color: #bbb;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dotOn {
+    height: 25px;
+    width: 25px;
+    background-color: #00a3da;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.inserimento {
+    text-align: center;
+}
+
+.table-inserimento td {
+    text-align: right;
+}
+
+.analogSlider {
+    -webkit-appearance: none;
+    margin: 14px;
+    width: 250px;
+    height: 15px;
+    background: #ff4f38;
+    outline: none;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.analogSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #003249;
+    cursor: pointer;
+}
+
+.analogSlider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #003249;
+    cursor: pointer;
+}
+
+table.input th {
+    padding: 35px 50px 35px 50px;
+}
+
+table.text-align th,
+table.text-align td {
+    text-align: left;
+    padding-right: 5px;
+}
+
+.button {
+    background-color: black;
+    border: none;
+    color: white;
+    padding: 13px 29px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.button:hover {
+    background-color: white;
+    color: black;
+    border: 2px solid black;
+}
+
+.bodyPost {
+    position: absolute;
+    top: 40%;
+    left: 40%;
+    text-align: center;
+    font-size: 20px;
+}
+
+canvas {
+    width: 200px !important;
+    height: 100px !important;
+    margin-left: -50px;
+}
+
+table.sonde th {
+    padding: 10px;
+}
