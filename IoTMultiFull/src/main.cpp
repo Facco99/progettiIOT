@@ -158,13 +158,8 @@ byte _mac[] = {0x00, 0x08, 0xDC, 0x11, 0x27, 0x8C};
 // Creo il server AsyncWebServer sulla porta 80
 AsyncWebServer server2(80);
 
-//Variabili per accensione e spegnimento relay
-const char *PARAM_INPUT_1 = "output"; //id del relay associato allo switch
-const char *PARAM_INPUT_2 = "state";  //Stato, se acceso oppure spento
-
-//Variabile per slider
-const char *PARAM_SLIDER_1 = "id";    //id dell'analogOutput collegato allo slider
-const char *PARAM_SLIDER_2 = "value"; //Valore dello slider
+//Variabile endpoint
+const char *PARAM_ENDPOINT = "args"; //argomenti della richiesta
 
 String outputState(int output)
 {
@@ -415,9 +410,9 @@ const char *privatekey = "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIKKrJwZE/cbjFP
 const char *deviceid = "10af3922e9c583002809960c";
 
 //Funzione cloud per l'accensione e lo spegnimento dei relay
-int cloudWriteDigital(const char *param)
+int writeDigital(const char *param)
 {
-  if (strlen(param) < 3)
+  if (strlen(param) != 3)
   {
     return -1;
   }
@@ -427,24 +422,26 @@ int cloudWriteDigital(const char *param)
   char *num;
   reg = strtok(value, ",");
   printDebug("Registro = " + String(atoi(reg) + 303));
-  if (atoi(reg) < 1 || atoi(reg) > 4 || isalpha(*reg))
-  {
-    return -1;
-  }
   num = strtok(NULL, ",");
   printDebug("Valore = " + String(atoi(num)));
-  if (atoi(num) < 0 || atoi(num) > 1 || isalpha(*num))
+  if (reg == NULL || num == NULL)
   {
     return -1;
   }
+
+  if (atoi(reg) < 1 || atoi(reg) > 4 || isalpha(*reg) || atoi(num) < 0 || atoi(num) > 1 || isalpha(*num))
+  {
+    return -1;
+  }
+
   digitalOutput[atoi(reg) - 1] = atoi(num);
   return 1;
 }
 
 //Funzione Cloud per la modifica dei valori degli output analogici
-int cloudWriteAnalog(const char *param)
+int writeAnalog(const char *param)
 {
-  if (strlen(param) < 3)
+  if (strlen(param) > 5)
   {
     return -1;
   }
@@ -454,21 +451,23 @@ int cloudWriteAnalog(const char *param)
   char *num;
   reg = strtok(value, ",");
   printDebug(String(atoi(reg) + 307));
-  if (atoi(reg) < 1 || atoi(reg) > 4 || isalpha(*reg))
-  {
-    return -1;
-  }
   num = strtok(NULL, ",");
   printDebug(String(atoi(num)));
-  if (atoi(num) < 0 || atoi(num) > 255 || isalpha(*num))
+  if (reg == NULL || num == NULL)
   {
     return -1;
   }
+
+  if (atoi(reg) < 1 || atoi(reg) > 4 || isalpha(*reg) || atoi(num) < 0 || atoi(num) > 255 || isalpha(*num))
+  {
+    return -1;
+  }
+  
   analogOutput[atoi(reg) - 1] = atoi(num);
   return 1;
 }
 
-int cloudWriteAllDigital(const char *param)
+int writeAllDigital(const char *param)
 {
   if (atoi(param) < 0 || atoi(param) > 1 || isalpha(*param))
   {
@@ -521,9 +520,9 @@ void setup()
   //Prima begin
   trackle.begin(DEVICEID, PRIVATEKEY);
   //Dopo funzioni cloud
-  trackle.post("cloudWriteDigital", cloudWriteDigital);
-  trackle.post("cloudWriteAnalog", cloudWriteAnalog);
-  trackle.post("cloudWriteAllDigital", cloudWriteAllDigital);
+  trackle.post("writeDigital", writeDigital);
+  trackle.post("writeAnalog", writeAnalog);
+  trackle.post("writeAllDigital", writeAllDigital);
   trackle.get("json", jsonValori);
   //Connessione in cloud
   trackle.connect(SSID_NAME, SSID_PASSWORD);
@@ -543,25 +542,15 @@ void setup()
   server2.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request)
              { request->send(SPIFFS, "/style.css", "text/css"); });
   //Funzione per l'accensione e spegnimento dei relay
-  server2.on("/update", HTTP_GET, [](AsyncWebServerRequest *request)
+  server2.on("/writeDigital", HTTP_POST, [](AsyncWebServerRequest *request)
              {
                String inputMessage1; //Variabile per salvare id dello switch
                // GET Relays value
-               if (request->hasParam(PARAM_INPUT_1) && request->hasParam(PARAM_INPUT_2))
+               if (request->hasParam(PARAM_ENDPOINT))
                {
-                 inputMessage1 = request->getParam(PARAM_INPUT_1)->value();
-                 printDebug("Id dello switch = " + inputMessage1);
-                 inputMessage1 = inputMessage1.substring(5, 6);
+                 inputMessage1 = request->getParam(PARAM_ENDPOINT)->value();
                  modbus_mutex.lock();
-                 for (int i = 0; i < 4; i++)
-                 {
-                   if (inputMessage1.toInt() == i + 1)
-                   {
-                     printDebug("Prima = " + String(digitalOutput[i]));
-                     digitalOutput[i] = request->getParam(PARAM_INPUT_2)->value().toInt(); //Salvo il valore nell'array digitalOutput[4]
-                     printDebug("Dopo = " + String(digitalOutput[i]));
-                   }
-                 }
+                 writeDigital(inputMessage1.c_str()); //Richiamo la funzione sopra
                  modbus_mutex.unlock();
                }
                else
@@ -571,24 +560,15 @@ void setup()
                request->send(200); //Invio una risposta al server
              });
   //Funzione per la scrittura su output analogici tramite gli slider
-  server2.on("/slider", HTTP_GET, [](AsyncWebServerRequest *request)
+  server2.on("/writeAnalog", HTTP_POST, [](AsyncWebServerRequest *request)
              {
                String inputMessage1; //Variabile per salvare id dello slider
 
-               if (request->hasParam(PARAM_SLIDER_1) && request->hasParam(PARAM_SLIDER_2)) //Controllo se questi due parametri sono presenti
+               if (request->hasParam(PARAM_ENDPOINT)) //Controllo se questi due parametri sono presenti
                {
-                 inputMessage1 = request->getParam(PARAM_SLIDER_1)->value().substring(4, 5); //Varibile per salvare l'id dello slider
+                 inputMessage1 = request->getParam(PARAM_ENDPOINT)->value(); //Varibile per salvare l'id dello slider
                  modbus_mutex.lock();
-                 for (int i = 0; i < 4; i++)
-                 {
-                   //In base all'id dello slider scrivo sul registro corretto
-                   if (inputMessage1.toInt() == i + 1)
-                   {
-                     printDebug("Prima = " + String(analogOutput[i]));
-                     analogOutput[i] = request->getParam(PARAM_SLIDER_2)->value().toInt(); //Salvo il valore nell'array analogOutput[4]
-                     printDebug("Dopo = " + String(analogOutput[i]));
-                   }
-                 }
+                 writeAnalog(inputMessage1.c_str()); //Richiamo la funzione qua sopra
                  modbus_mutex.unlock();
                }
                else

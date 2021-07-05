@@ -68,9 +68,9 @@
     function toggleCheckbox(element) {
         var xhr = new XMLHttpRequest();
         if (element.checked) {
-            xhr.open("GET", "/update?output=" + element.id + "&state=1", true);
+            xhr.open("POST", "/writeDigital?args=" + element.id.substring(5, 6) + ",1", true);
         } else {
-            xhr.open("GET", "/update?output=" + element.id + "&state=0", true);
+            xhr.open("POST", "/writeDigital?args=" + element.id.substring(5, 6) + ",0", true);
         }
         xhr.send();
     }
@@ -81,29 +81,29 @@
         if (element.id == "aOut1") {
             var sliderValue1 = document.getElementById("aOut1").value;
             xhr.open(
-                "GET",
-                "/slider?id=" + element.id + "&value=" + sliderValue1,
+                "POST",
+                "/writeAnalog?args=" + element.id.substring(4, 5) + "," + sliderValue1,
                 true
             );
         } else if (element.id == "aOut2") {
             var sliderValue2 = document.getElementById("aOut2").value;
             xhr.open(
-                "GET",
-                "/slider?id=" + element.id + "&value=" + sliderValue2,
+                "POST",
+                "/writeAnalog?args=" + element.id.substring(4, 5) + "," + sliderValue2,
                 true
             );
         } else if (element.id == "aOut3") {
             var sliderValue3 = document.getElementById("aOut3").value;
             xhr.open(
-                "GET",
-                "/slider?id=" + element.id + "&value=" + sliderValue3,
+                "POST",
+                "/writeAnalog?args=" + element.id.substring(4, 5) + "," + sliderValue3,
                 true
             );
         } else if (element.id == "aOut4") {
             var sliderValue4 = document.getElementById("aOut4").value;
             xhr.open(
-                "GET",
-                "/slider?id=" + element.id + "&value=" + sliderValue4,
+                "POST",
+                "/writeAnalog?args=" + element.id.substring(4, 5) + "," + sliderValue4,
                 true
             );
         }
@@ -147,85 +147,108 @@
 </script>
 
 <body onload="onLoad()">
+    <ul>
+        <li><a href="/inserimento">Setup Nomi</a></li>
+        <li><a href="#connessione">Setup Connessione</a></li>
+    </ul>
     <div class="grid-container">
         <div class="grid-item">
             <h2>Output Digitali</h2>
             <table class="text-align">
-                <th>%RELAY1%</th>
-                <td><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="relay1"><span class="slider"></span></label></td>
+                <tr>
+                    <th>%RELAY1%</th>
+                    <td><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="relay1"><span class="slider"></span></label></td>
+                </tr>
                 <tr>
                     <th>%RELAY2%</th>
                     <td><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="relay2"><span class="slider"></span></label></td>
-                    <tr>
-                        <th>%RELAY3%</th>
-                        <td><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="relay3"><span class="slider"></span></label></td>
-                        <tr>
-                            <th>%RELAY4%</th>
-                            <td><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="relay4"><span class="slider"></span></label></td>
+                </tr>
+                <tr>
+                    <th>%RELAY3%</th>
+                    <td><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="relay3"><span class="slider"></span></label></td>
+                </tr>
+                <tr>
+                    <th>%RELAY4%</th>
+                    <td><label class="switch"><input type="checkbox" onchange="toggleCheckbox(this)" id="relay4"><span class="slider"></span></label></td>
+                </tr>
             </table>
         </div>
         <div class="grid-item">
             <h2>Sonde</h2>
             <table class="text-align sonde">
-                <th>%SONDA1%</th>
-                <td id="sonda0">Sonda non collegata</td>
+                <tr>
+                    <th>%SONDA1%</th>
+                    <td id="sonda0">Sonda non collegata</td>
+                </tr>
                 <tr>
                     <th>%SONDA2%</th>
                     <td id="sonda1">Sonda non collegata</td>
-                    <tr>
-                        <th>%SONDA3%</th>
-                        <td id="sonda2">Sonda non collegata</td>
-                        <tr>
-                            <th>%SONDA4%</th>
-                            <td id="sonda3">Sonda non collegata</td>
+                </tr>
+                <tr>
+                    <th>%SONDA3%</th>
+                    <td id="sonda2">Sonda non collegata</td>
+                </tr>
+                <tr>
+                    <th>%SONDA4%</th>
+                    <td id="sonda3">Sonda non collegata</td>
+                </tr>
             </table>
         </div>
         <div class="grid-item">
             <h2>Output Analogici</h2>
             <table>
-                <th>%ANALOGOUTPUT1%</th>
-                <td><input type="range" class="analogSlider" onmouseup="updateSliderPWM(this)" ontouchend="updateSliderPWM(this)" id="aOut1" min="0" max="255"></td>
+                <tr>
+                    <th>%ANALOGOUTPUT1%</th>
+                    <td><input type="range" class="analogSlider" onmouseup="updateSliderPWM(this)" ontouchend="updateSliderPWM(this)" id="aOut1" min="0" max="255"></td>
+                </tr>
                 <tr>
                     <th>%ANALOGOUTPUT2%</th>
                     <td><input type="range" class="analogSlider" onmouseup="updateSliderPWM(this)" ontouchend="updateSliderPWM(this)" id="aOut2" min="0" max="255"></td>
-                    <tr>
-                        <th>%ANALOGOUTPUT3%</th>
-                        <td><input type="range" class="analogSlider" onmouseup="updateSliderPWM(this)" ontouchend="updateSliderPWM(this)" id="aOut3" min="0" max="255"></td>
-                        <tr>
-                            <th>%ANALOGOUTPUT4%</th>
-                            <td><input type="range" class="analogSlider" onmouseup="updateSliderPWM(this)" ontouchend="updateSliderPWM(this)" id="aOut4" min="0" max="255"></td>
+                </tr>
+                <tr>
+                    <th>%ANALOGOUTPUT3%</th>
+                    <td><input type="range" class="analogSlider" onmouseup="updateSliderPWM(this)" ontouchend="updateSliderPWM(this)" id="aOut3" min="0" max="255"></td>
+                </tr>
+                <tr>
+                    <th>%ANALOGOUTPUT4%</th>
+                    <td><input type="range" class="analogSlider" onmouseup="updateSliderPWM(this)" ontouchend="updateSliderPWM(this)" id="aOut4" min="0" max="255"></td>
+                </tr>
             </table>
         </div>
         <div class="grid-item">
             <h2>Input Digitali</h2>
             <table class="input">
-                <th>%DIGITALINPUT1%</th>
-                <td><button class="dotOff" id="button0" disabled></button></td>
-                <th>%DIGITALINPUT2%</th>
-                <td><button class="dotOff" id="button1" disabled></button></td>
+                <tr>
+                    <th>%DIGITALINPUT1%</th>
+                    <td><button class="dotOff" id="button0" disabled></button></td>
+                    <th>%DIGITALINPUT2%</th>
+                    <td><button class="dotOff" id="button1" disabled></button></td>
+                </tr>
                 <tr>
                     <th>%DIGITALINPUT3%</th>
                     <td><button class="dotOff" id="button2" disabled></button></td>
                     <th>%DIGITALINPUT4%</th>
                     <td><button class="dotOff" id="button3" disabled></button></td>
-
+                </tr>
             </table>
         </div>
         <div class="grid-item">
-            <a href="/inserimento"><button class="button">Inserisci nomi campi</button></a>
         </div>
         <div class="grid-item">
             <h2>Input Analogici</h2>
             <table class="input">
-                <th>%ANALOGINPUT1%</th>
-                <td><canvas id="analogInput0"></canvas></td>
-                <th>%ANALOGINPUT2%</th>
-                <td><canvas id="analogInput1"></canvas></td>
+                <tr>
+                    <th>%ANALOGINPUT1%</th>
+                    <td><canvas id="analogInput0"></canvas></td>
+                    <th>%ANALOGINPUT2%</th>
+                    <td><canvas id="analogInput1"></canvas></td>
+                </tr>
                 <tr>
                     <th>%ANALOGINPUT3%</th>
                     <td><canvas id="analogInput2"></canvas></td>
                     <th>%ANALOGINPUT4%</th>
                     <td><canvas id="analogInput3"></canvas></td>
+                </tr>
             </table>
         </div>
     </div>
